@@ -1,13 +1,18 @@
-const admin = require('firebase-admin');
-const serviceAccount = require('./serviceAccountKey.json');
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-  databaseURL: process.env.FIREBASE_DATABASE_URL,
-  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
-});
+const { initializeApp } = require('firebase/app');
 
-const db = admin.firestore();
-const bucket = admin.storage().bucket();
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
 
-module.exports = { admin, db, bucket };
+// Your web app's Firebase configuration
+const firebaseConfig = {
+  apiKey: "AIzaSyAKufzi1H20M7ruxz1YwC5yFPApItv2Yiw",
+  authDomain: "abc-stevedoring.firebaseapp.com",
+  projectId: "abc-stevedoring",
+  storageBucket: "abc-stevedoring.firebasestorage.app",
+  messagingSenderId: "404631990029",
+  appId: "1:404631990029:web:5f01a0b32013d3bc0bca44"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);

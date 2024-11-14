@@ -5,5 +5,8 @@ const router = express.Router();
 
 router.post('/employees', upload.single('photo'), employeeController.addEmployee);
 
-// Additional routes for update, delete, etc.
+router.get('/employees', (req, res) => {
+  res.send('Employees list');
+});
+
 module.exports = router;

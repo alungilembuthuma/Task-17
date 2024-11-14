@@ -1,24 +1,33 @@
-const { db, bucket } = require('../config/firebaseConfig');
-const { v4: uuidv4 } = require('uuid');
+const { getFirestore, collection, getDocs } = require('firebase/firestore');
+const { initializeApp } = require('firebase/app');
 
-// Add a new employee
-exports.addEmployee = async (req, res) => {
+// Initialize Firebase (Make sure to replace with your config)
+const firebaseConfig = {
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE_PROJECT_ID,
+  storageBucket: process.env.FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Function to get all employees
+const getEmployees = async (req, res) => {
   try {
-    const { name, surname, age, idNumber, role } = req.body;
-    const file = req.file;
-    const fileName = `${uuidv4()}_${file.originalname}`;
-    
-    const fileUpload = bucket.file(fileName);
-    await fileUpload.save(file.buffer);
-    const fileURL = `https://firebasestorage.googleapis.com/v0/b/${bucket.name}/o/${encodeURIComponent(fileName)}?alt=media`;
-
-    const employeeData = { name, surname, age, idNumber, role, photo: fileURL };
-    await db.collection('employees').add(employeeData);
-
-    res.status(201).json({ message: 'Employee added successfully', data: employeeData });
+    const employeeRef = collection(db, 'employees'); // Reference to the Firestore collection
+    const snapshot = await getDocs(employeeRef); // Get all documents in the collection
+    const employeeList = snapshot.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    }));
+    res.status(200).json(employeeList); // Return the employee list as a JSON response
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error getting employees: ", error);
+    res.status(500).json({ message: 'Error retrieving employees' });
   }
 };
 
-// Additional CRUD operations (update, delete, etc.) go here
+module.exports = { getEmployees };
